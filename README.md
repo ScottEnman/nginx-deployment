@@ -19,10 +19,10 @@ After cloning the repo, navidate to the project root and complete the following 
 
 1. **Install Docker**  
    Install Docker using Homebrew:
-   ```bash
+  ```bash
   brew install docker --cask
   docker desktop start
-   ```
+  ```
 
 2. **Install Minikube**  
    Install Minikube using Homebrew:
