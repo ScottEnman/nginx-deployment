@@ -38,3 +38,6 @@ terraform.rc
 
 # Ignore Providers
 .terraform/
+
+# Ignore license files
+LICENSE.txt
