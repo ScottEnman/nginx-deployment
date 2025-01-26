@@ -125,7 +125,7 @@ Follow the steps to create the Helm chart files for your NGINX application.
 
 3. Package the Helm chart:
    ```bash
-   helm package .
+   helm package ./my-nginx-chart
    ```
    This will create a `.tgz` file like `my-nginx-chart-0.1.0.tgz` in your directory.
 
