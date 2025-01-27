@@ -71,4 +71,4 @@ kubectl get pods
 kubectl get services
 
 # Expose and access the service using:
-minikube service my-nginx-chart-nginx
+minikube service my-nginx-chart

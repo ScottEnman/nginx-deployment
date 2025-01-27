@@ -1,20 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-nginx
+  name: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-nginx
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-nginx
+        app: {{ .Release.Name }}
     spec:
       containers:
         - name: nginx
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           ports:
             - containerPort: 80
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: htpasswd
+              mountPath: /etc/nginx/.htpasswd
+              subPath: .htpasswd
+            - name: static-files
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: {{ .Release.Name }}-nginx-config
+        - name: htpasswd
+          configMap:
+            name: {{ .Release.Name }}-htpasswd
+        - name: static-files
+          configMap:
+            name: {{ .Release.Name }}-static-files

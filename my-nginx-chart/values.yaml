@@ -2,11 +2,15 @@ replicaCount: 1
 
 image:
   repository: nginx
-  tag: "1.21.6"
+  tag: stable
   pullPolicy: IfNotPresent
 
 service:
-  type: ClusterIP
+  type: NodePort
   port: 80
 
-resources: {}
+auth:
+  enabled: true
+  htpasswd: |
+    # Generated using htpasswd tool (e.g., `htpasswd -nb <username> <password>`)
+    admin:$apr1$i/0Ee4q9$.93A1uNm7e.trNStARxeh.
