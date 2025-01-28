@@ -8,6 +8,3 @@ image:
 service:
   type: NodePort
   port: 80
-
-auth:
-    encoded: "YWRtaW46JGFwcjEkWVVCVjNkYWckRGx2QXZTSWlPOGxVZ2VDY0czLjZ6MQo="
