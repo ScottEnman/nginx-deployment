@@ -8,9 +8,3 @@ image:
 service:
   type: NodePort
   port: 80
-
-auth:
-  enabled: true
-  htpasswd: |
-    # Generated using htpasswd tool (e.g., `htpasswd -nb <username> <password>`)
-    admin:$apr1$i/0Ee4q9$.93A1uNm7e.trNStARxeh.

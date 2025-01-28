@@ -21,7 +21,7 @@ spec:
             - name: nginx-config
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
-            - name: htpasswd
+            - name: auth-config
               mountPath: /etc/nginx/.htpasswd
               subPath: .htpasswd
             - name: static-files
@@ -30,9 +30,9 @@ spec:
         - name: nginx-config
           configMap:
             name: {{ .Release.Name }}-nginx-config
-        - name: htpasswd
+        - name: auth-config
           configMap:
-            name: {{ .Release.Name }}-htpasswd
+            name: nginx-auth-config
         - name: static-files
           configMap:
             name: {{ .Release.Name }}-static-files

@@ -23,10 +23,10 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-htpasswd
+  name: nginx-auth-config
 data:
   .htpasswd: |
-    {{- .Values.auth.htpasswd | nindent 4 }}
+    {{ .Values.auth.encoded | b64dec }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -37,6 +37,6 @@ data:
     <html>
     <head><title>Welcome</title></head>
     <body>
-      <h1>Welcome to the NGINX App!</h1>
+      <h1>Hi TrojAI, welcome to the NGINX App!</h1>
     </body>
     </html>
