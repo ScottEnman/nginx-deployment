@@ -13,6 +13,9 @@ After cloning the repo, navidate to the project root and complete the following 
   ./mac_setup.sh
    ```
 
+Note: You will be prompted to set an nginx username and password that will only be stored on your local machine and used to log into
+the app running inside of minikube.
+
 ## Complete Setup No Auth (Manual Steps)
 
 ### Prerequisites
