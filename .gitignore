@@ -44,3 +44,6 @@ LICENSE.txt
 
 # Ignore Helm Package
 my-nginx-chart-0.1.0.tgz
+
+# Ignore .htpasswd
+.htpasswd

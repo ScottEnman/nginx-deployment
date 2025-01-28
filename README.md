@@ -4,7 +4,7 @@ This guide provides step-by-step instructions to deploy a simple NGINX applicati
 
 ---
 
-## Quick Start (Run Script)
+## Deploy Nginx With Basic Authentication (Run Script)
 
 After cloning the repo, navidate to the project root and complete the following steps from a terminal.
 
@@ -13,7 +13,10 @@ After cloning the repo, navidate to the project root and complete the following 
   ./mac_setup.sh
    ```
 
-## Complete Setup (Manual Steps)
+Note: You will be prompted to set an nginx username and password that will only be stored on your local machine and used to log into
+the app running inside of minikube.
+
+## Complete Setup No Auth (Manual Steps)
 
 ### Prerequisites
 

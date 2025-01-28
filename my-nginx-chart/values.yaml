@@ -2,11 +2,9 @@ replicaCount: 1
 
 image:
   repository: nginx
-  tag: "1.21.6"
+  tag: stable
   pullPolicy: IfNotPresent
 
 service:
-  type: ClusterIP
+  type: NodePort
   port: 80
-
-resources: {}
