@@ -37,6 +37,6 @@ data:
     <html>
     <head><title>Welcome</title></head>
     <body>
-      <h1>Hi TrojAI, welcome to the NGINX App!</h1>
+      <h1>Welcome to the NGINX App!</h1>
     </body>
     </html>

@@ -1,6 +1,6 @@
 # Function: Package Helm Chart and move the package to the current working directory
 package_helm_chart() {
-  local chart_path="./my-nginx-chart"
+  local chart_path="./nginx-chart"
   local package_output
   package_output=$(helm package "$chart_path" 2>&1)
 
@@ -70,7 +70,7 @@ generate_htpasswd() {
     fi
 
     # Specify the relative path to values.yaml
-    values_file="my-nginx-chart/values.yaml" # Update this with the correct path
+    values_file="nginx-chart/values.yaml" # Update this with the correct path
 
     # Check if values.yaml exists
     if grep -q "auth:" "$values_file"; then
@@ -148,4 +148,4 @@ kubectl get pods
 kubectl get services
 
 # Expose and access the service using:
-minikube service my-nginx-chart
+minikube service nginx-chart

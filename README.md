@@ -83,8 +83,8 @@ Follow the steps to create the Helm chart files for your NGINX application.
 
 1. Create a directory for your chart:
    ```bash
-   mkdir my-nginx-chart
-   cd my-nginx-chart
+   mkdir nginx-chart
+   cd nginx-chart
    ```
 
 2. Create the following files:
@@ -92,7 +92,7 @@ Follow the steps to create the Helm chart files for your NGINX application.
    - `Chart.yaml`:
      ```yaml
      apiVersion: v2
-     name: my-nginx-chart
+     name: nginx-chart
      version: 0.1.0
      ```
 
@@ -147,9 +147,9 @@ Follow the steps to create the Helm chart files for your NGINX application.
 
 3. Package the Helm chart:
    ```bash
-   helm package ./my-nginx-chart
+   helm package ./nginx-chart
    ```
-   This will create a `.tgz` file like `my-nginx-chart-0.1.0.tgz` in your directory.
+   This will create a `.tgz` file like `nginx-chart-0.1.0.tgz` in your directory.
 
 ---
 
@@ -161,7 +161,7 @@ mkdir nginx-deployment
 cd nginx-deployment
 ```
 
-Move the packaged Helm chart (`my-nginx-chart-0.1.0.tgz`) into the `nginx-deployment` directory.
+Move the packaged Helm chart (`nginx-chart-0.1.0.tgz`) into the `nginx-deployment` directory.
 
 Create a `main.tf` file with the following content:
 
@@ -180,8 +180,8 @@ provider "helm" {
 }
 
 resource "helm_release" "nginx" {
-  name       = "my-nginx"
-  chart      = "./my-nginx-chart-0.1.0.tgz"
+  name       = "nginx"
+  chart      = "./nginx-chart-0.1.0.tgz"
   namespace  = "default"
 
   values = [
@@ -224,7 +224,7 @@ resource "helm_release" "nginx" {
 ### Using Minikube Service Command
 Expose and access the service using:
 ```bash
-minikube service my-nginx-chart
+minikube service nginx-chart
 ```
 
 ---

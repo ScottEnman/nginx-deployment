@@ -11,11 +11,11 @@ provider "helm" {
 }
 
 resource "helm_release" "nginx" {
-  name       = "my-nginx-chart"
-  chart      = "./my-nginx-chart-0.1.0.tgz"
+  name       = "nginx-chart"
+  chart      = "./nginx-chart-0.1.0.tgz"
   namespace  = "default"
 
   values = [
-    file("my-nginx-chart/values.yaml")
+    file("nginx-chart/values.yaml")
   ]
 }
