@@ -224,7 +224,7 @@ resource "helm_release" "nginx" {
 ### Option 1: Using Minikube Service Command
 Expose and access the service using:
 ```bash
-minikube service my-nginx-chart-nginx
+minikube service my-nginx-chart
 ```
 
 #### Option 2: Using curl (Optional)
