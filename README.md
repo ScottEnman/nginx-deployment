@@ -221,22 +221,11 @@ resource "helm_release" "nginx" {
 
 ### Step 5: Access the NGINX Service
 
-### Option 1: Using Minikube Service Command
+### Using Minikube Service Command
 Expose and access the service using:
 ```bash
 minikube service my-nginx-chart
 ```
-
-#### Option 2: Using curl (Optional)
-1. Get the Minikube IP:
-   ```bash
-   minikube ip
-   ```
-
-2. Use `curl` to test the NGINX server:
-   ```bash
-   curl http://<minikube-ip>:<port>
-   ```
 
 ---
 
