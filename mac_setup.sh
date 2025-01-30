@@ -1,4 +1,4 @@
-# Function: Package Helm Chart and move the package to the current working directory
+# Function: Package Helm Chart and move the package to the current working directory.
 package_helm_chart() {
   local chart_path="./nginx-chart"
   local package_output
@@ -9,7 +9,7 @@ package_helm_chart() {
     return 1
   fi
 
-  # Extract the location of the package from the output
+  # Extract the location of the package from the output.
   local package_location
   package_location=$(echo "$package_output" | grep -oE "([^ ]+\.tgz)")
 
@@ -27,14 +27,14 @@ package_helm_chart() {
 # Function: The user will be prompted to enter a username and password for authentication into nginx.
 # This will be base64 encoded and passed to the values.yaml file locally.
 generate_htpasswd() {
-    # Prompt for username
+    # Prompt for the username.
     read -p "Enter username for NGINX authentication: " username
 
-    # Prompt for password (hidden input)
+    # Prompt for password (hidden input).
     read -s -p "Enter password for NGINX authentication: " password
     echo
 
-    # Confirm password (hidden input)
+    # Confirm the password (hidden input).
     read -s -p "Confirm password: " password_confirm
     echo
 
@@ -44,18 +44,18 @@ generate_htpasswd() {
         return 1
     fi
 
-    # Generate .htpasswd entry
+    # Generate .htpasswd entry.
     htpasswd_entry=$(htpasswd -nb "$username" "$password" 2>/dev/null)
     if [ -z "$htpasswd_entry" ]; then
         echo "Error: Failed to generate .htpasswd entry. Please check the htpasswd command."
         return 1
     fi
 
-    # Output to a file
+    # Output the crednetials to a file.
     output_file=".htpasswd"
     echo "$htpasswd_entry" > "$output_file"
 
-    # Base64 encode the .htpasswd file
+    # Base64 encode the .htpasswd file.
     if [ ! -f "$output_file" ]; then
         echo "Error: File '$output_file' does not exist."
         return 1
@@ -69,39 +69,39 @@ generate_htpasswd() {
         echo "File successfully base64 encoded."
     fi
 
-    # Specify the relative path to values.yaml
-    values_file="nginx-chart/values.yaml" # Update this with the correct path
+    # Specify the relative path to values.yaml.
+    values_file="nginx-chart/values.yaml"
 
-    # Check if values.yaml exists
+    # Check if values.yaml exists.
     if grep -q "auth:" "$values_file"; then
-        # If 'auth' section exists, check for 'encoded'
+        # If 'auth' section exists, check for 'encoded'.
         if grep -q "encoded:" "$values_file"; then
-            # If 'encoded' exists, overwrite the value
+            # If 'encoded' exists, overwrite the value.
             sed -i '' '/encoded:/c\
     encoded: "'"$encoded_htpasswd"'"' "$values_file"
         else
-            # If 'encoded' does not exist, append it under 'auth'
+            # If 'encoded' does not exist, append it under 'auth'.
             sed -i '' '/auth:/a\
     encoded: "'"$encoded_htpasswd"'"' "$values_file"
         fi
     else
-        # If 'auth' does not exist, add it and the encoded value
-        echo "" >> "$values_file" # Ensure there's a blank line before appending
+        # If 'auth' does not exist, add it and the encoded value.
+        echo "" >> "$values_file"
         echo "auth:" >> "$values_file"
         echo "  encoded: \"$encoded_htpasswd\"" >> "$values_file"
     fi
 
 
-        # Success message
+        # Success message.
         echo ".htpasswd has been generated and encoded successfully!"
         echo "Location: $PWD/$output_file"
         echo "Updated $values_file with the encoded content."
     }
 
-# Generate .htpasswd entry for nginx authentication
+# Generate .htpasswd entry for nginx authentication.
 generate_htpasswd
 
-#Install Docker
+#Install Docker:
 brew install docker --cask
 docker desktop start
 
@@ -118,7 +118,7 @@ brew install helm
 
 brew install terraform
 
-# Confirm that Minikube, `kubectl`, Helm, and Terraform are installed:
+# Confirm that Minikube, kubectl, Docker, Helm, and Terraform are installed:
 docker version
 minikube version
 kubectl version --client
@@ -134,16 +134,16 @@ kubectl cluster-info
 # Package the Helm chart and move the package into the working directory:
 package_helm_chart
 
-# Initialize Terraform
+# Initialize Terraform.
 terraform init
 
-# Validate Configuration
+# Validate Configuration.
 terraform plan
 
-# Apply Configuration
+# Deploy the Nginx and its configuration.
 terraform apply -auto-approve
 
-# Verify Deployment
+# Verify Deployment.
 kubectl get pods
 kubectl get services
 

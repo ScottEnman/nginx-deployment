@@ -24,7 +24,7 @@ This script automates the following tasks:
 - Exposes the NGINX service on Minikube.
 - Opens a browser window for easy access to the NGINX service, where you can log in using the credentials provided at the beginning of the script.
 
-This streamlined process ensures that you can quickly deploy and access your NGINX application with minimal manual setup.
+This streamlined process ensures that you can quickly deploy and access your NGINX application with minimal manual setup. Once logged into the nginx, you will see a flow chart of the deployment process.
 
 ---
 
