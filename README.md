@@ -1,171 +1,162 @@
 # Deploying a Basic NGINX Helm Chart on Minikube (macOS) with Terraform
 
-This guide provides step-by-step instructions to deploy a simple NGINX application on a local Minikube cluster using Helm and Terraform on macOS.
+This guide walks you through deploying an NGINX application on Minikube using Helm and Terraform on macOS.
 
 ---
 
-## Deploy Nginx With Basic Authentication (Run Script)
+## Quick Setup (With Auth - Run Script)
 
-After cloning the repo, navidate to the project root and complete the following steps from a terminal.
+After cloning the repo, navigate to the project root and run:
 
-   ```bash
-  chmod +x mac_setup.sh
-  ./mac_setup.sh
-   ```
+```bash
+chmod +x mac_setup.sh
+./mac_setup.sh
+```
 
-Note: You will be prompted to set an nginx username and password that will only be stored on your local machine and used to log into
-the app running inside of minikube.
+You will be prompted to set an NGINX username and password for local use inside Minikube.
 
-## Complete Setup No Auth (Manual Steps)
+### Script Overview
+
+This script automates the following tasks:
+
+- Installs the necessary prerequisites (docker, minikube, kubectl, helm, and terraform) for deploying NGINX, including Helm charts and Terraform configuration.
+- Deploys the Helm charts using Terraform.
+- Exposes the NGINX service on Minikube.
+- Opens a browser window for easy access to the NGINX service, where you can log in using the credentials provided at the beginning of the script.
+
+This streamlined process ensures that you can quickly deploy and access your NGINX application with minimal manual setup.
+
+---
+
+## Manual Setup (No Auth)
 
 ### Prerequisites
 
-1. **Install Docker**  
-   Install Docker using Homebrew:
-  ```bash
-  brew install docker --cask
-  docker desktop start
-  ```
+Install the required tools using Homebrew:
 
-2. **Install Minikube**  
-   Install Minikube using Homebrew:
-   ```bash
-   brew install minikube
-   ```
+```bash
+brew install docker --cask minikube kubectl helm terraform
+```
 
-3. **Install kubectl**  
-   Install `kubectl` to interact with the Minikube cluster:
-   ```bash
-   brew install kubectl
-   ```
+Start Docker:
 
-4. **Install Helm**  
-   Install Helm to manage and deploy Helm charts:
-   ```bash
-   brew install helm
-   ```
+```bash
+docker desktop start
+```
 
-5. **Install Terraform**  
-   Install Terraform to automate infrastructure provisioning:
-   ```bash
-   brew install terraform
-   ```
+Verify installations:
 
-6. **Verify Installations**  
-   Confirm that Docker, Minikube, `kubectl`, Helm, and Terraform are installed:
-   ```bash
-   docker version
-   minikube version
-   kubectl version --client
-   helm version
-   terraform version
-   ```
+```bash
+docker version
+minikube version
+kubectl version --client
+helm version
+terraform version
+```
 
 ---
 
 ### Step 1: Start Minikube
 
-Start a local Kubernetes cluster using Minikube:
+Start Minikube and verify:
+
 ```bash
 minikube start
-```
-
-Verify that Minikube is running:
-```bash
 kubectl cluster-info
 ```
 
 ---
 
-### Step 2: Create a Basic Helm Chart
+### Step 2: Create the NGINX Helm Chart
 
-Follow the steps to create the Helm chart files for your NGINX application.
+1. Create the chart directory and navigate to it:
 
-1. Create a directory for your chart:
-   ```bash
-   mkdir nginx-chart
-   cd nginx-chart
-   ```
+```bash
+mkdir nginx-chart && cd nginx-chart
+```
 
-2. Create the following files:
+2. Create the required files:
 
-   - `Chart.yaml`:
-     ```yaml
-     apiVersion: v2
-     name: nginx-chart
-     version: 0.1.0
-     ```
+- `Chart.yaml`:
 
-   - `values.yaml`:
-     ```yaml
-     replicaCount: 1
-     image:
-       repository: nginx
-       tag: stable
-     service:
-       type: NodePort
-       port: 80
-     ```
+```yaml
+apiVersion: v2
+name: nginx-chart
+version: 0.1.0
+```
 
-   - `templates/deployment.yaml`:
-     ```yaml
-     apiVersion: apps/v1
-     kind: Deployment
-     metadata:
-       name: {{ .Release.Name }}
-     spec:
-       replicas: {{ .Values.replicaCount }}
-       selector:
-         matchLabels:
-           app: {{ .Release.Name }}
-       template:
-         metadata:
-           labels:
-             app: {{ .Release.Name }}
-         spec:
-           containers:
-           - name: nginx
-             image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-             ports:
-             - containerPort: 80
-     ```
+- `values.yaml`:
 
-   - `templates/service.yaml`:
-     ```yaml
-     apiVersion: v1
-     kind: Service
-     metadata:
-       name: {{ .Release.Name }}
-     spec:
-       type: {{ .Values.service.type }}
-       ports:
-       - port: {{ .Values.service.port }}
-         targetPort: 80
-       selector:
-         app: {{ .Release.Name }}
-     ```
+```yaml
+replicaCount: 1
+image:
+  repository: nginx
+  tag: stable
+service:
+  type: NodePort
+  port: 80
+```
 
-3. Package the Helm chart:
-   ```bash
-   helm package ./nginx-chart
-   ```
-   This will create a `.tgz` file like `nginx-chart-0.1.0.tgz` in your directory.
+- `templates/deployment.yaml`:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: nginx
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        ports:
+        - containerPort: 80
+```
+
+- `templates/service.yaml`:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  - port: {{ .Values.service.port }}
+    targetPort: 80
+  selector:
+    app: {{ .Release.Name }}
+```
+
+3. Package the chart:
+
+```bash
+helm package ./nginx-chart
+```
 
 ---
 
-### Step 3: Create a Terraform Configuration for Helm Deployment
+### Step 3: Terraform Configuration
 
-Create a directory for your Terraform configuration:
+1. Create a directory for Terraform:
+
 ```bash
-mkdir nginx-deployment
-cd nginx-deployment
+mkdir nginx-deployment && cd nginx-deployment
 ```
 
-Move the packaged Helm chart (`nginx-chart-0.1.0.tgz`) into the `nginx-deployment` directory.
+2. Move the packaged chart (`nginx-chart-0.1.0.tgz`) into this directory.
 
-Create a `main.tf` file with the following content:
+3. Create `main.tf`:
 
-#### `main.tf`
 ```hcl
 provider "kubernetes" {
   config_path    = "~/.kube/config"
@@ -180,9 +171,9 @@ provider "helm" {
 }
 
 resource "helm_release" "nginx" {
-  name       = "nginx"
-  chart      = "./nginx-chart-0.1.0.tgz"
-  namespace  = "default"
+  name      = "nginx"
+  chart     = "./nginx-chart-0.1.0.tgz"
+  namespace = "default"
 
   values = [
     file("./values.yaml")
@@ -194,35 +185,39 @@ resource "helm_release" "nginx" {
 
 ### Step 4: Initialize and Apply Terraform
 
-1. **Initialize Terraform**
-   ```bash
-   terraform init
-   ```
+1. Initialize Terraform:
 
-2. **Validate Configuration**
-   ```bash
-   terraform validate
-   ```
+```bash
+terraform init
+```
 
-3. **Apply Configuration**
-   Deploy the NGINX Helm chart using Terraform:
-   ```bash
-   terraform apply
-   ```
-   Type `yes` to confirm the deployment.
+2. Validate the configuration:
 
-4. **Verify Deployment**
-   ```bash
-   kubectl get pods
-   kubectl get services
-   ```
+```bash
+terraform validate
+```
+
+3. Apply the configuration to deploy:
+
+```bash
+terraform apply
+```
+
+Type "yes" to confirm.
+
+4. Verify the deployment:
+
+```bash
+kubectl get pods
+kubectl get services
+```
 
 ---
 
 ### Step 5: Access the NGINX Service
 
-### Using Minikube Service Command
-Expose and access the service using:
+Expose and access the service:
+
 ```bash
 minikube service nginx-chart
 ```
@@ -231,21 +226,22 @@ minikube service nginx-chart
 
 ### Step 6: Clean Up
 
-#### Uninstall the Helm Release
-Remove the NGINX app using Terraform:
+1. **Uninstall the Helm Release**:
+
 ```bash
 terraform destroy
 ```
-   Type `yes` to confirm the destruction.
 
-#### Stop Minikube
-Shut down the Minikube cluster:
+Type "yes" to confirm.
+
+2. **Stop Minikube**:
+
 ```bash
 minikube stop
 ```
 
-#### Delete the Minikube Cluster (Optional)
-Clean up all Minikube resources:
+3. **Delete Minikube Cluster (Optional)**:
+
 ```bash
 minikube delete
 ```
@@ -254,20 +250,23 @@ minikube delete
 
 ### Troubleshooting
 
-1. **Check Terraform Logs**:
-   ```bash
-   terraform show
-   ```
+- **Check Terraform Logs**:
 
-2. **Check Pod Logs**:
-   ```bash
-   kubectl logs <pod-name>
-   ```
+```bash
+terraform show
+```
 
-3. **Verify Minikube Status**:
-   ```bash
-   minikube status
-   ```
+- **Check Pod Logs**:
+
+```bash
+kubectl logs <pod-name>
+```
+
+- **Verify Minikube Status**:
+
+```bash
+minikube status
+```
 
 ---
 
