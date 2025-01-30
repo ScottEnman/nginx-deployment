@@ -19,24 +19,3 @@ data:
         error_page 404 /404.html;
       }
     }
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: nginx-auth-config
-data:
-  .htpasswd: |
-    {{ .Values.auth.encoded | b64dec }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Release.Name }}-static-files
-data:
-  index.html: |
-    <html>
-    <head><title>Welcome</title></head>
-    <body>
-      <h1>Welcome to the NGINX App!</h1>
-    </body>
-    </html>

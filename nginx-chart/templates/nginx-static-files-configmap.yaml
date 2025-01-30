@@ -1,0 +1,115 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-static-files
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Deployment Process</title>
+      <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+          startOnLoad: true,
+          theme: "dark"
+        });
+      </script>
+      <style>
+        body {
+          font-family: 'Arial', sans-serif;
+          background-color: #121212;
+          color: #ffffff;
+          text-align: center;
+          margin: 0;
+          padding: 0;
+        }
+        h1, h2 {
+          color: #4FC3F7;
+          margin-top: 20px;
+        }
+        .flowchart-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-top: 30px;
+          padding: 20px;
+          width: 90%;
+        }
+        .mermaid {
+          width: 100%;
+          max-width: 1000px;
+          background: #1e1e1e;
+          border-radius: 10px;
+          padding: 30px;
+          box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.3);
+        }
+        .code-box {
+          background: #1e1e1e;
+          padding: 40px;
+          border-radius: 15px;
+          display: inline-block;
+          text-align: left;
+          width: 85%;
+          max-width: 800px;
+          box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.3);
+          border: 2px solid #4FC3F7;
+          margin-top: 30px;
+        }
+        code {
+          color: #ffcc00;
+          font-size: 16px;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+        }
+        h2 {
+          color: #FFD700;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>🚀 NGINX Deployment with Helm & Terraform</h1>
+      <div class="flowchart-container">
+        <div class="mermaid">
+          graph TD;
+            A[🟢 Start] -->|1. Install Prerequisites| B[Install Docker, Minikube, kubectl, Helm, Terraform];
+            B -->|2. Setup Authentication| C[User Configures .htpasswd];
+            C -->|3. Deploy NGINX with Helm| D[Package & Deploy Helm Chart];
+            D -->|4. Apply Infrastructure| E[Initialize & Apply Terraform];
+            E -->|5. Expose Service| F[Expose NGINX Service with Minikube];
+            F -->|6. Access Secured UI| G[Open Browser & Login];
+        </div>
+      </div>
+      <h2>⚙️ Deployment Steps</h2>
+      <div class="code-box">
+        <pre>
+        <code>
+        # Step 1: Install the necessary tools
+        brew install docker --cask
+        brew install minikube
+        brew install kubectl
+        brew install helm
+        brew install terraform
+
+        # Step 2: Set up authentication credentials
+        ./generate_htpasswd.sh
+
+        # Step 3: Package and deploy the Helm chart
+        ./package_helm_chart.sh
+
+        # Step 4: Initialize and apply Terraform configuration
+        terraform init
+        terraform plan
+        terraform apply -auto-approve
+
+        # Step 5: Expose the NGINX service
+        minikube service nginx-chart
+
+        # Step 6: Open the browser and log in to the secured web UI
+        </code>
+        </pre>
+      </div>
+    </body>
+    </html>

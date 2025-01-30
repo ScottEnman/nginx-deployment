@@ -24,7 +24,7 @@ package_helm_chart() {
   mv $package_location .
 }
 
-# Function: THr user will be promopted to enter a username and password for authentication into nginx.
+# Function: The user will be prompted to enter a username and password for authentication into nginx.
 # This will be base64 encoded and passed to the values.yaml file locally.
 generate_htpasswd() {
     # Prompt for username
@@ -138,7 +138,7 @@ package_helm_chart
 terraform init
 
 # Validate Configuration
-terraform plan -auto-approve
+terraform plan
 
 # Apply Configuration
 terraform apply -auto-approve
