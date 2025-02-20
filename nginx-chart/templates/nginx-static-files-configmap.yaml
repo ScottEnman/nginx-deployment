@@ -9,14 +9,8 @@ data:
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Deployment Process</title>
-      <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-        mermaid.initialize({ 
-          startOnLoad: true,
-          theme: "dark"
-        });
-      </script>
+      <title>NGINX Health Metrics</title>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       <style>
         body {
           font-family: 'Arial', sans-serif;
@@ -30,86 +24,114 @@ data:
           color: #4FC3F7;
           margin-top: 20px;
         }
-        .flowchart-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          margin-top: 30px;
-          padding: 20px;
-          width: 90%;
-        }
-        .mermaid {
-          width: 100%;
-          max-width: 1000px;
-          background: #1e1e1e;
-          border-radius: 10px;
+        .chart-container {
+          width: 80%;
+          max-width: 900px;
+          margin: 20px auto;
           padding: 30px;
+          background-color: #1e1e1e;
+          border-radius: 10px;
           box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.3);
-        }
-        .code-box {
-          background: #1e1e1e;
-          padding: 40px;
-          border-radius: 15px;
-          display: inline-block;
-          text-align: left;
-          width: 85%;
-          max-width: 800px;
-          box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.3);
-          border: 2px solid #4FC3F7;
-          margin-top: 30px;
-        }
-        code {
-          color: #ffcc00;
-          font-size: 16px;
-          white-space: pre-wrap;
-          word-wrap: break-word;
-        }
-        h2 {
-          color: #FFD700;
         }
       </style>
     </head>
     <body>
-      <h1>🚀 NGINX Deployment with Helm & Terraform</h1>
-      <div class="flowchart-container">
-        <div class="mermaid">
-          graph TD;
-            A[🟢 Start] -->|1. Install Prerequisites| B[Install Docker, Minikube, kubectl, Helm, Terraform];
-            B -->|2. Setup Authentication| C[User Configures .htpasswd];
-            C -->|3. Deploy NGINX with Helm| D[Package & Deploy Helm Chart];
-            D -->|4. Apply Infrastructure| E[Initialize & Apply Terraform];
-            E -->|5. Expose Service| F[Expose NGINX Service with Minikube];
-            F -->|6. Access Secured UI| G[Open Browser & Login];
-        </div>
+      <h1>NGINX Health Metrics</h1>
+      <div class="chart-container">
+        <canvas id="nginxMetricsChart"></canvas>
       </div>
-      <h2>⚙️ Deployment Steps</h2>
-      <div class="code-box">
-        <pre>
-        <code>
-        # Step 1: Install the necessary tools
-        brew install docker --cask
-        brew install minikube
-        brew install kubectl
-        brew install helm
-        brew install terraform
 
-        # Step 2: Set up authentication credentials
-        ./generate_htpasswd.sh
+      <script>
+        async function fetchPrometheusData() {
+          const prometheusUrl = 'http://localhost:9090/api/v1/query';
+          
+          const queries = {
+            "total_requests": 'nginx_http_requests_total{job="nginx-exporter"}',
+            "4xx_requests": 'nginx_http_requests_total{status=~"4.*", job="nginx-exporter"}',
+            "5xx_requests": 'nginx_http_requests_total{status=~"5.*", job="nginx-exporter"}',
+            "active_connections": 'nginx_connections_active{job="nginx-exporter"}',
+            "bytes_sent": 'nginx_http_bytes_sent_total{job="nginx-exporter"}',
+            "nginx_up": 'up{job="nginx-exporter"}',
+            "response_time": 'avg(nginx_http_request_duration_seconds_sum{job="nginx-exporter"}) by (instance)'
+          };
 
-        # Step 3: Package and deploy the Helm chart
-        ./package_helm_chart.sh
+          try {
+            const responses = await Promise.all(Object.values(queries).map(query =>
+              fetch(`${prometheusUrl}?query=${encodeURIComponent(query)}`).then(res => res.json())
+            ));
 
-        # Step 4: Initialize and apply Terraform configuration
-        terraform init
-        terraform plan
-        terraform apply -auto-approve
+            // Log the responses for debugging
+            console.log('Prometheus responses:', responses);
 
-        # Step 5: Expose the NGINX service
-        minikube service nginx-chart
+            // Return the values if the structure is correct
+            return responses.map(res => {
+              if (res.status === 'success' && res.data.result.length > 0) {
+                return res.data.result[0].value[1];
+              } else {
+                console.error('Error: Invalid data or empty result');
+                return 'N/A'; // Fallback in case of error
+              }
+            });
+          } catch (error) {
+            console.error('Error fetching Prometheus data:', error);
+            return ['N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A']; // Fallback if fetch fails
+          }
+        }
 
-        # Step 6: Open the browser and log in to the secured web UI
-        </code>
-        </pre>
-      </div>
+        async function updateChart() {
+          const [totalRequests, fourxxRequests, fivexxRequests, activeConnections, bytesSent, nginxUp, responseTime] = await fetchPrometheusData();
+
+          console.log('Fetched Data:', totalRequests, fourxxRequests, fivexxRequests, activeConnections, bytesSent, nginxUp, responseTime);
+
+          myChart.data.datasets[0].data = [
+            parseFloat(totalRequests),
+            parseFloat(fourxxRequests) + parseFloat(fivexxRequests), // Sum of 4xx and 5xx errors
+            parseFloat(activeConnections),
+            parseFloat(bytesSent),
+            parseFloat(nginxUp),
+            parseFloat(responseTime)
+          ];
+          myChart.update();
+        }
+
+        const ctx = document.getElementById('nginxMetricsChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Total Requests', 'Total Errors (4xx + 5xx)', 'Active Connections', 'Bytes Sent', 'NGINX Up Status', 'Response Time (Avg)'],
+            datasets: [{
+              label: 'NGINX Metrics',
+              data: [0, 0, 0, 0, 0, 0], // Initial empty values
+              backgroundColor: [
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(255, 159, 64, 0.6)',
+                'rgba(153, 102, 255, 0.6)',
+                'rgba(255, 159, 64, 0.6)', // For Up Status
+                'rgba(75, 192, 192, 0.6)' // For Response Time
+              ],
+              borderColor: [
+                'rgba(75, 192, 192, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(75, 192, 192, 1)'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+
+        setInterval(updateChart, 5000); // Update chart every 5 seconds
+        updateChart(); // Initial chart load
+      </script>
     </body>
     </html>

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-prometheus
+  labels:
+    app: {{ .Release.Name }}-prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-prometheus
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:latest
+          ports:
+            - containerPort: 9090
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+          volumeMounts:
+            - name: prometheus-config-volume
+              mountPath: /etc/prometheus
+      volumes:
+        - name: prometheus-config-volume
+          configMap:
+            name: {{ .Release.Name }}-prometheus-config

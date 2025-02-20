@@ -5,15 +5,44 @@ metadata:
 data:
   nginx.conf: |
     events {}
+
     http {
       server {
         listen 80;
 
+        # Main Website - Protected with Basic Auth
         location / {
           root /usr/share/nginx/html;
           index index.html;
           auth_basic "Restricted Area";
           auth_basic_user_file /etc/nginx/.htpasswd;
+        }
+
+        # Prometheus /stub_status - No Auth, Allow Cluster Access
+        location /stub_status {
+            stub_status;
+            allow all;
+            access_log off;
+        }
+
+        # Proxy Prometheus through your NGINX with CORS enabled
+        location /prometheus/ {
+          proxy_pass http://localhost:9090/;
+          
+          # Add CORS headers for all responses
+          add_header 'Access-Control-Allow-Origin' '*' always;
+          add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+          add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization, Accept' always;
+          
+          # Handle OPTIONS requests (preflight) - fix for CORS
+          if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+            add_header 'Access-Control-Allow-Headers' 'Content-Type, Authorization, Accept' always;
+            return 204;
+          }
+
+          # Optionally, add proxy cache settings or logging configurations if needed
         }
 
         error_page 404 /404.html;
