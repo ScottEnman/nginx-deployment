@@ -34,16 +34,6 @@ generate_htpasswd() {
     read -s -p "Enter password for NGINX authentication: " password
     echo
 
-    # Confirm the password (hidden input).
-    read -s -p "Confirm password: " password_confirm
-    echo
-
-    # Check if passwords match
-    if [ "$password" != "$password_confirm" ]; then
-        echo "Error: Passwords do not match. Please try again."
-        return 1
-    fi
-
     # Generate .htpasswd entry.
     htpasswd_entry=$(htpasswd -nb "$username" "$password" 2>/dev/null)
     if [ -z "$htpasswd_entry" ]; then
@@ -147,5 +137,38 @@ terraform apply -auto-approve
 kubectl get pods
 kubectl get services
 
-# Expose and access the service using:
-minikube service nginx-chart
+# Port forward Prometheus in the background
+kubectl port-forward svc/nginx-chart-prometheus 9090 &
+PROMETHEUS_PID=$!
+
+# Wait briefly to ensure port-forward is up before opening the browser
+sleep 2
+
+# Open Prometheus Query UI (not metrics page, only query interface)
+if command -v xdg-open > /dev/null; then
+    xdg-open http://localhost:9090
+elif command -v open > /dev/null; then
+    open http://localhost:9090
+else
+    echo "Prometheus Query UI: http://localhost:9090"
+fi
+
+# Expose and open the NGINX frontend service in the browser
+minikube service nginx-chart --url &
+MINIKUBE_PID=$!
+
+# Wait briefly to ensure the service is up before opening the browser
+sleep 2
+
+# Open the NGINX Frontend UI in browser using the exposed URL
+if command -v xdg-open > /dev/null; then
+    xdg-open $(minikube service nginx-chart --url)
+elif command -v open > /dev/null; then
+    open $(minikube service nginx-chart --url)
+else
+    echo "NGINX Frontend UI: $(minikube service nginx-chart --url)"
+fi
+
+# Wait for all background jobs to finish (keep port-forward running)
+wait $PROMETHEUS_PID
+wait $MINIKUBE_PID

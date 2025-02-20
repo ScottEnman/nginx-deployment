@@ -1,10 +1,10 @@
-# Deploying a Basic NGINX Helm Chart on Minikube (macOS) with Terraform
+# Deploying a Basic NGINX & Prometheus Helm Chart on Minikube (macOS) with Terraform
 
-This guide walks you through deploying an NGINX application on Minikube using Helm and Terraform on macOS.
+This guide walks you through deploying an NGINX application on Minikube using Helm and Terraform on macOS. The deployment includes setting up Prometheus to scrape NGINX stats and display them via a simple NGINX frontend.
 
 ---
 
-## Quick Setup (With Auth - Run Script)
+## Quick NGINX & Prometheus Setup (With Auth - Run Script)
 
 After cloning the repo, navigate to the project root and run:
 
@@ -19,16 +19,18 @@ You will be prompted to set an NGINX username and password for local use inside 
 
 This script automates the following tasks:
 
-- Installs the necessary prerequisites (docker, minikube, kubectl, helm, and terraform) for deploying NGINX, including Helm charts and Terraform configuration.
-- Deploys the Helm charts using Terraform.
+- Installs the necessary prerequisites (docker, minikube, kubectl, helm, terraform) for deploying NGINX, Prometheus, and related Helm charts.
+- Deploys the Helm charts (NGINX, Prometheus) using Terraform.
+- Configures Prometheus to scrape NGINX metrics.
+- Deploys an NGINX frontend that displays Prometheus scraped stats.
 - Exposes the NGINX service on Minikube.
 - Opens a browser window for easy access to the NGINX service, where you can log in using the credentials provided at the beginning of the script.
 
-This streamlined process ensures that you can quickly deploy and access your NGINX application with minimal manual setup. Once logged into the nginx, you will see a flow chart of the deployment process.
+This streamlined process ensures that you can quickly deploy and access your NGINX application with minimal manual setup. Once logged into NGINX, you will see a chart displaying the deployment's performance metrics.
 
 ---
 
-## Manual Setup (No Auth)
+## Manual NGINX ONLY Setup (No Auth)
 
 ### Prerequisites
 
