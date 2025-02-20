@@ -24,9 +24,12 @@ This script automates the following tasks:
 - Configures Prometheus to scrape NGINX metrics.
 - Deploys an NGINX frontend that displays Prometheus scraped stats.
 - Exposes the NGINX service on Minikube.
-- Opens a browser window for easy access to the NGINX service, where you can log in using the credentials provided at the beginning of the script.
+- Opens a browser window for easy access to the Prometheus frontend where you can make queries to gather NGINX metrics.
+- The script will print the NGINX frontend URL, where you can log in using the credentials provided at the beginning of the script.
+  - **Once logged into NGINX, you will see a chart displaying the deployment's performance metrics.**
 
-This streamlined process ensures that you can quickly deploy and access your NGINX application with minimal manual setup. Once logged into NGINX, you will see a chart displaying the deployment's performance metrics.
+This streamlined process ensures that you can quickly deploy and access your NGINX application with minimal manual setup.
+
 
 ---
 
